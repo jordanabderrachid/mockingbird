@@ -1,8 +1,11 @@
 package config_test
 
-import "testing"
-import "github.com/jordanabderrachid/mockingbird/config"
-import "github.com/stretchr/testify/assert"
+import (
+	"testing"
+
+	"github.com/jordanabderrachid/mockingbird/config"
+	"github.com/stretchr/testify/assert"
+)
 
 func TestParse(t *testing.T) {
 	var cases = []struct {
