@@ -21,9 +21,27 @@ type Service struct {
 
 // Endpoint .
 type Endpoint struct {
-	Name   string `hcl:",key"`
-	Method string `hcl:"method"`
-	Path   string `hcl:"path"`
+	Name      string     `hcl:",key"`
+	Method    string     `hcl:"method"`
+	Path      string     `hcl:"path"`
+	Behaviors []Behavior `hcl:"behavior"`
+}
+
+// Behavior .
+type Behavior struct {
+	Name     string   `hcl:",key"`
+	Request  Request  `hcl:"request"`
+	Response Response `hcl:"response"`
+}
+
+// Request .
+type Request struct {
+	ContentType string `hcl:"content-type"`
+}
+
+// Response .
+type Response struct {
+	Code int `hcl:"code"`
 }
 
 func (s Server) String() string {
@@ -45,7 +63,24 @@ func (s Service) String() string {
 }
 
 func (e Endpoint) String() string {
-	return fmt.Sprintf("[endpoint] name=%s, method=%s, path=%s", e.Name, e.Method, e.Path)
+	behaviors := make([]string, len(e.Behaviors))
+	for i, behavior := range e.Behaviors {
+		behaviors[i] = fmt.Sprintf("\t\t\t%s", behavior.String())
+	}
+
+	return fmt.Sprintf("[endpoint] name=%s, method=%s, path=%s\n%s", e.Name, e.Method, e.Path, strings.Join(behaviors, "\n"))
+}
+
+func (b Behavior) String() string {
+	return fmt.Sprintf("[behavior] name=%s\n%s\n%s", b.Name, b.Request.String(), b.Response.String())
+}
+
+func (r Request) String() string {
+	return fmt.Sprintf("\t\t\t\t[request] content-type=%s", r.ContentType)
+}
+
+func (r Response) String() string {
+	return fmt.Sprintf("\t\t\t\t[response] code=%d", r.Code)
 }
 
 // Parse reads the given string input and parses it as a Config struct.

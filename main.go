@@ -9,10 +9,6 @@ import (
 	"github.com/jordanabderrachid/mockingbird/config"
 )
 
-var okHandleFunc = func (w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200)
-}
-
 func main() {
 	rawConfig, err := loadFile("./config.hcl")
 	if err != nil {
@@ -43,7 +39,15 @@ func createRouter(server *config.Server) *mux.Router {
 }
 
 func registerEndpoint(router *mux.Router, hostname string, endpoint config.Endpoint) {
-	router.HandleFunc(endpoint.Path, okHandleFunc).Host(hostname).Methods(endpoint.Method)
+	for _, behavior := range endpoint.Behaviors {
+		router.HandleFunc(endpoint.Path, translateBehavior(behavior)).Host(hostname).Methods(endpoint.Method)
+	}
+}
+
+func translateBehavior(behavior config.Behavior) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(behavior.Response.Code)
+	}
 }
 
 func loadFile(path string) (string, error) {

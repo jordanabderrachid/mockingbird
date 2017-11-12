@@ -4,6 +4,16 @@ service "greeter" {
   endpoint "greet" {
     method = "GET"
     path = "/hello"
+
+    behavior "ok" {
+      request {
+        content-type = "application/json"
+      }
+
+      response {
+        code = 200
+      }
+    }
   }
 }
 
@@ -13,5 +23,15 @@ service "barista" {
   endpoint "order-beverage" {
     method = "POST"
     path = "/order"
+
+    behavior "not-enough-coffee" {
+      request {
+        content-type = "application/json"
+      }
+
+      response {
+        code = 400
+      }
+    }
   }
 }
